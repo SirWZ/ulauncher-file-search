@@ -30,7 +30,7 @@
       "id": "terminal_emulator",
       "type": "select",
       "name": "Terminal Emulator",
-      "description": "Sets the terminal emulator to open directories directly in the terminal",
+      "description": "使用终端打开文件所在目录",
       "default_value": "deepin-terminal",
       "options": [
         "deepin-terminal",
@@ -64,9 +64,7 @@
         10,
         15,
         20,
-        30,
-        40,
-        50
+        30
       ]
     }
   ]
