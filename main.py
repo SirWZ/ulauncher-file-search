@@ -67,7 +67,7 @@ class FileSearchExtension(Extension):
         '''
         if int(self.preferences['limit']) != 0:
           cmd.append('--max-results')
-          cmd.append(int(self.preferences['limit']))
+          cmd.append(self.preferences['limit'])
         '''
           添加多个匹配关键字
         '''
