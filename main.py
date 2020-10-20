@@ -64,7 +64,12 @@ class FileSearchExtension(Extension):
             cmd.append('d')
 
         cmd.append(query)
-        cmd.append(self.preferences['base_dir'])
+        '''
+          添加支持多个检索目录
+        '''
+        if not self.preferences['base_dir']:
+          for single_base_dir in self.preferences['base_dir'].split(' '):
+            cmd.append(single_base_dir)
 
         process = subprocess.Popen(cmd,
                                    stdout=subprocess.PIPE,

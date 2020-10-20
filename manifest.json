@@ -38,7 +38,7 @@
       "id": "base_dir",
       "type": "input",
       "name": "Base dir",
-      "description": "The base directory to start your searches. Ex: /",
+      "description": "The base directory to start your searches.Multiple separated by spaces. Ex: / ",
       "default_value": "/"
     },
     {
