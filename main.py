@@ -70,9 +70,8 @@ class FileSearchExtension(Extension):
         '''
           添加支持多个检索目录
         '''
-        if not self.preferences['base_dir']:
-          for single_base_dir in self.preferences['base_dir'].split(' '):
-            cmd.append(single_base_dir)
+        for single_base_dir in self.preferences['base_dir'].split(' '):
+          cmd.append(single_base_dir)
 
         process = subprocess.Popen(cmd,
                                    stdout=subprocess.PIPE,
@@ -98,9 +97,8 @@ class FileSearchExtension(Extension):
             folder_icon = icon_folder.get_filename()
         else:
             folder_icon = "images/folder.png"
-
         # pylint: disable=C0103
-        for f in files[:15]:
+        for f in files[:self.preferences['limit']]:
             filename = os.path.splitext(f)
             if os.path.isdir(f):
                 icon = folder_icon

@@ -11,19 +11,19 @@
     {
       "id": "kw",
       "type": "keyword",
-      "name": "fd - File and Directory Search",
+      "name": "fd - 文件和目录搜索",
       "default_value": "fd"
     },
     {
       "id": "ff_kw",
       "type": "keyword",
-      "name": "ff - File Search",
+      "name": "ff - 文件搜索",
       "default_value": "ff"
     },
     {
       "id": "fd_kw",
       "type": "keyword",
-      "name": "fdir - Directory Search",
+      "name": "fdir - 目录搜索",
       "default_value": "fdir"
     },
     {
@@ -32,7 +32,12 @@
       "name": "Terminal Emulator",
       "description": "Sets the terminal emulator to open directories directly in the terminal",
       "default_value": "gnome-terminal",
-      "options": ["gnome-terminal", "tilix", "terminator", "xfce-terminal"]
+      "options": [
+        "gnome-terminal",
+        "tilix",
+        "terminator",
+        "xfce-terminal"
+      ]
     },
     {
       "id": "base_dir",
@@ -47,6 +52,21 @@
       "name": "threads",
       "description": "Set number of threads to use for searching & executing (default: number of available CPU cores)",
       "default_value": "0"
+    },
+    {
+      "id": "limit",
+      "type": "select",
+      "name": "limit",
+      "description": "展示检索个数",
+      "default_value": 20,
+      "options": [
+        10,
+        15,
+        20,
+        30,
+        40,
+        50
+      ]
     }
   ]
 }
