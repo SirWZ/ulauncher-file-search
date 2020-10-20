@@ -70,10 +70,9 @@ class FileSearchExtension(Extension):
         '''
           添加支持多个检索目录
         '''
-        # for single_base_dir in self.preferences['base_dir'].split(' '):
-        #   cmd.append(single_base_dir)
-        cmd.append(self.preferences['base_dir'])
-        self.logger.info(cmd)
+        for single_base_dir in self.preferences['base_dir'].split(' '):
+          cmd.append(single_base_dir)
+        self.logger.error(' '.join(cmd))
         process = subprocess.Popen(cmd,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
