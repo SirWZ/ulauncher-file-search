@@ -40,7 +40,7 @@ class FileSearchExtension(Extension):
         """ Try with the default fd or the previously successful command """
         bin_name = 'fd'
         try:
-            subprocess.check_call([bin_name])
+            subprocess.check_call(['fd','-V'])
         except OSError:
             bin_name = "fdfind" if bin_name == "fd" else "fd"
 
@@ -73,6 +73,7 @@ class FileSearchExtension(Extension):
         # for single_base_dir in self.preferences['base_dir'].split(' '):
         #   cmd.append(single_base_dir)
         cmd.append(self.preferences['base_dir'])
+        self.logger.info(cmd)
         process = subprocess.Popen(cmd,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
