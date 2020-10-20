@@ -46,9 +46,15 @@ class FileSearchExtension(Extension):
 
         """ Searches for Files using fd command """
         cmd = [
-            'timeout', '5s', 'ionice', '-c', '3', bin_name, '--threads', '1',
-            '--hidden'
+            'timeout', '5s', 'ionice', '-c', '3', bin_name,'--hidden'
         ]
+        '''
+          将线程数量作为preference传入数据内
+        '''
+        preferences_threads = self.preferences['threads']
+        if preferences_threads != 0:
+          cmd.append('--threads')
+          cmd.append(preferences_threads)
 
         if file_type == FILE_SEARCH_FILE:
             cmd.append('-t')

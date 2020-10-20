@@ -40,6 +40,13 @@
       "name": "Base dir",
       "description": "The base directory to start your searches. Ex: /",
       "default_value": "/"
+    },
+    {
+      "id": "threads",
+      "type": "input",
+      "name": "threads",
+      "description": "Set number of threads to use for searching & executing (default: number of available CPU cores)",
+      "default_value": "0"
     }
   ]
 }
