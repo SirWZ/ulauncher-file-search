@@ -31,8 +31,9 @@
       "type": "select",
       "name": "Terminal Emulator",
       "description": "Sets the terminal emulator to open directories directly in the terminal",
-      "default_value": "gnome-terminal",
+      "default_value": "deepin-terminal",
       "options": [
+        "deepin-terminal",
         "gnome-terminal",
         "tilix",
         "terminator",

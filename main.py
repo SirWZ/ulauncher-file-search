@@ -125,7 +125,7 @@ class FileSearchExtension(Extension):
 
         # some terminals might work differently. This is already prepared for that.
         if terminal_emulator in [
-                'gnome-terminal', 'terminator', 'tilix', 'xfce-terminal'
+                'deepin-terminal','gnome-terminal', 'terminator', 'tilix', 'xfce-terminal'
         ]:
             return RunScriptAction(terminal_emulator,
                                    ['--working-directory', path])
