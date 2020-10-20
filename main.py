@@ -62,8 +62,11 @@ class FileSearchExtension(Extension):
         elif file_type == FILE_SEARCH_DIRECTORY:
             cmd.append('-t')
             cmd.append('d')
+        '''
+          添加多个匹配关键字
+        '''
+        cmd.append('.*'.join(query.split(' ')))
 
-        cmd.append(query)
         '''
           添加支持多个检索目录
         '''
