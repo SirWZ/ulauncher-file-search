@@ -43,7 +43,7 @@
       "id": "base_dir",
       "type": "input",
       "name": "Base dir",
-      "description": "The base directory to start your searches.Multiple separated by spaces. Ex: / ",
+      "description": "指定被检索的目录,多个用空格分隔.默认为 '/' ",
       "default_value": "/"
     },
     {

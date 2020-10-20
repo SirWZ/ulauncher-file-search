@@ -70,9 +70,9 @@ class FileSearchExtension(Extension):
         '''
           添加支持多个检索目录
         '''
-        for single_base_dir in self.preferences['base_dir'].split(' '):
-          cmd.append(single_base_dir)
-
+        # for single_base_dir in self.preferences['base_dir'].split(' '):
+        #   cmd.append(single_base_dir)
+        cmd.append(self.preferences['base_dir'])
         process = subprocess.Popen(cmd,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
@@ -172,9 +172,8 @@ class KeywordQueryEventListener(EventListener):
                                     query,
                                     on_enter=HideWindowAction())
             ])
-
         items = []
-        for result in results[:15]:
+        for result in results[:extension.preferences['limit']]:
             items.append(
                 ExtensionSmallResultItem(
                     icon=result['icon'],
