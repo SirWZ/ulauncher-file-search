@@ -78,7 +78,6 @@ class FileSearchExtension(Extension):
         '''
         for single_base_dir in self.preferences['base_dir'].split(' '):
           cmd.append(single_base_dir)
-        self.logger.error(' '.join(cmd))
         process = subprocess.Popen(cmd,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
