@@ -51,7 +51,7 @@ class FileSearchExtension(Extension):
         '''
           将线程数量作为preference传入数据内
         '''
-        preferences_threads = self.preferences['threads']
+        preferences_threads = int(self.preferences['threads'])
         if preferences_threads != 0:
           cmd.append('--threads')
           cmd.append(preferences_threads)
@@ -98,7 +98,7 @@ class FileSearchExtension(Extension):
         else:
             folder_icon = "images/folder.png"
         # pylint: disable=C0103
-        for f in files[:self.preferences['limit']]:
+        for f in files[:int(self.preferences['limit'])]:
             filename = os.path.splitext(f)
             if os.path.isdir(f):
                 icon = folder_icon
@@ -173,7 +173,7 @@ class KeywordQueryEventListener(EventListener):
                                     on_enter=HideWindowAction())
             ])
         items = []
-        for result in results[:extension.preferences['limit']]:
+        for result in results[:int(extension.preferences['limit'])]:
             items.append(
                 ExtensionSmallResultItem(
                     icon=result['icon'],
