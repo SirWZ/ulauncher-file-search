@@ -62,7 +62,9 @@ class FileSearchExtension(Extension):
         elif file_type == FILE_SEARCH_DIRECTORY:
             cmd.append('-t')
             cmd.append('d')
-
+        '''
+          增加 fd --max-result 提升响应速度
+        '''
         if int(self.preferences['limit']) != 0:
           cmd.append('--max-results')
           cmd.append(int(self.preferences['limit']))
