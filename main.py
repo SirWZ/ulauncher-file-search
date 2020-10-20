@@ -62,6 +62,10 @@ class FileSearchExtension(Extension):
         elif file_type == FILE_SEARCH_DIRECTORY:
             cmd.append('-t')
             cmd.append('d')
+
+        if int(self.preferences['limit']) != 0:
+          cmd.append('--max-results')
+          cmd.append(int(self.preferences['limit']))
         '''
           添加多个匹配关键字
         '''
