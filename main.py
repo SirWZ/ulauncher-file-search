@@ -98,7 +98,7 @@ class FileSearchExtension(Extension):
         else:
             folder_icon = "images/folder.png"
         # pylint: disable=C0103
-        for f in files[:self.preferences['limit']]:
+        for f in files[:20]:
             filename = os.path.splitext(f)
             if os.path.isdir(f):
                 icon = folder_icon
@@ -173,7 +173,7 @@ class KeywordQueryEventListener(EventListener):
                                     on_enter=HideWindowAction())
             ])
         items = []
-        for result in results[:extension.preferences['limit']]:
+        for result in results[:20]:
             items.append(
                 ExtensionSmallResultItem(
                     icon=result['icon'],
