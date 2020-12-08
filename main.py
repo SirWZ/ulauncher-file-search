@@ -5,6 +5,7 @@ import os
 import subprocess
 import mimetypes
 import gi
+
 gi.require_version('Gtk', '3.0')
 # pylint: disable=import-error
 from gi.repository import Gio, Gtk
@@ -29,166 +30,168 @@ FILE_SEARCH_FILE = 'FILE'
 
 
 class FileSearchExtension(Extension):
-    """ Main Extension Class  """
+  """ Main Extension Class  """
 
-    def __init__(self):
-        """ Initializes the extension """
-        super(FileSearchExtension, self).__init__()
-        self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
+  def __init__(self):
+    """ Initializes the extension """
+    super(FileSearchExtension, self).__init__()
+    self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
 
-    def search(self, query, file_type=None):
-        """ Try with the default fd or the previously successful command """
-        bin_name = 'fd'
-        try:
-            subprocess.check_call(['fd','-V'])
-        except OSError:
-            bin_name = "fdfind" if bin_name == "fd" else "fd"
+  def search(self, query, file_type=None):
+    """ Try with the default fd or the previously successful command """
+    bin_name = 'fd'
+    try:
+      subprocess.check_call(['fd', '-V'])
+    except OSError:
+      bin_name = "fdfind" if bin_name == "fd" else "fd"
 
-        """ Searches for Files using fd command """
-        cmd = [
-            'timeout', '5s', 'ionice', '-c', '3', bin_name,'--hidden'
-        ]
-        '''
-          将线程数量作为preference传入数据内
-        '''
-        preferences_threads = int(self.preferences['threads'])
-        if preferences_threads != 0:
-          cmd.append('--threads')
-          cmd.append(preferences_threads)
+    """ Searches for Files using fd command """
+    cmd = [
+      'timeout', '5s', 'ionice', '-c', '3', bin_name, '--hidden'
+    ]
+    '''
+      将线程数量作为preference传入数据内
+    '''
+    preferences_threads = int(self.preferences['threads'])
+    if preferences_threads != 0:
+      cmd.append('--threads')
+      cmd.append(preferences_threads)
 
-        if file_type == FILE_SEARCH_FILE:
-            cmd.append('-t')
-            cmd.append('f')
-        elif file_type == FILE_SEARCH_DIRECTORY:
-            cmd.append('-t')
-            cmd.append('d')
-        '''
-          增加 fd --max-result 提升响应速度
-        '''
-        if int(self.preferences['limit']) != 0:
-          cmd.append('--max-results')
-          cmd.append(self.preferences['limit'])
-        '''
-          添加多个匹配关键字
-        '''
-        cmd.append('.*'.join(query.split(' ')))
+    if file_type == FILE_SEARCH_FILE:
+      cmd.append('-t')
+      cmd.append('f')
+    elif file_type == FILE_SEARCH_DIRECTORY:
+      cmd.append('-t')
+      cmd.append('d')
+    '''
+      增加 fd --max-result 提升响应速度
+    '''
+    if int(self.preferences['limit']) != 0:
+      cmd.append('--max-results')
+      cmd.append(self.preferences['limit'])
+    '''
+      添加多个匹配关键字
+    '''
+    cmd.append('.*'.join(query.split(' ')))
 
-        '''
-          添加支持多个检索目录
-        '''
-        for single_base_dir in self.preferences['base_dir'].split(' '):
-          cmd.append(single_base_dir)
-        process = subprocess.Popen(cmd,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+    '''
+      添加支持多个检索目录
+    '''
+    for single_base_dir in self.preferences['base_dir'].split(' '):
+      cmd.append(single_base_dir)
+    process = subprocess.Popen(cmd,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
 
-        out, err = process.communicate()
+    out, err = process.communicate()
 
-        if err:
-            self.logger.error(err)
-            return []
+    if err:
+      self.logger.error(err)
+      return []
 
-        files = out.split('\n'.encode())
-        files = list([_f for _f in files if _f])  # remove empty lines
+    files = out.split('\n'.encode())
+    files = list([_f for _f in files if _f])  # remove empty lines
 
-        result = []
-        #get folder icon outside loop, so it only happens once
-        file = Gio.File.new_for_path("/")
-        folder_info = file.query_info('standard::icon', 0, Gio.Cancellable())
-        folder_icon = folder_info.get_icon().get_names()[0]
-        icon_theme = Gtk.IconTheme.get_default()
-        icon_folder = icon_theme.lookup_icon(folder_icon, 128, 0)
-        if icon_folder:
-            folder_icon = icon_folder.get_filename()
+    result = []
+    # get folder icon outside loop, so it only happens once
+    file = Gio.File.new_for_path("/")
+    folder_info = file.query_info('standard::icon', 0, Gio.Cancellable())
+    folder_icon = folder_info.get_icon().get_names()[0]
+    icon_theme = Gtk.IconTheme.get_default()
+    icon_folder = icon_theme.lookup_icon(folder_icon, 128, 0)
+    if icon_folder:
+      folder_icon = icon_folder.get_filename()
+    else:
+      folder_icon = "images/folder.png"
+    # pylint: disable=C0103
+    for f in files[:int(self.preferences['limit'])]:
+      filename = os.path.splitext(f)
+      if os.path.isdir(f):
+        icon = folder_icon
+      else:
+        type_, encoding = mimetypes.guess_type(f.decode('utf-8'))
+
+        if type_:
+          file_icon = Gio.content_type_get_icon(type_)
+          file_info = icon_theme.choose_icon(file_icon.get_names(), 128, 0)
+          if file_info:
+            icon = file_info.get_filename()
+          else:
+            icon = "images/file.png"
         else:
-            folder_icon = "images/folder.png"
-        # pylint: disable=C0103
-        for f in files[:int(self.preferences['limit'])]:
-            filename = os.path.splitext(f)
-            if os.path.isdir(f):
-                icon = folder_icon
-            else:
-                type_, encoding = mimetypes.guess_type(f.decode('utf-8'))
+          icon = "images/file.png"
 
-                if type_:
-                    file_icon = Gio.content_type_get_icon(type_)
-                    file_info = icon_theme.choose_icon(file_icon.get_names(), 128, 0)
-                    if file_info:
-                        icon = file_info.get_filename()
-                    else:
-                        icon = "images/file.png"
-                else:
-                    icon = "images/file.png"
+      result.append({'path': f, 'name': f, 'icon': icon})
 
-            result.append({'path': f, 'name': f, 'icon': icon})
+    return result
 
-        return result
+  def get_open_in_terminal_script(self, path):
+    """ Returns the script based on the type of terminal """
+    terminal_emulator = self.preferences['terminal_emulator']
 
-    def get_open_in_terminal_script(self, path):
-        """ Returns the script based on the type of terminal """
-        terminal_emulator = self.preferences['terminal_emulator']
+    # some terminals might work differently. This is already prepared for that.
+    if terminal_emulator in [
+      'deepin-terminal', 'gnome-terminal', 'terminator', 'tilix', 'xfce-terminal'
+    ]:
+      if terminal_emulator == 'deepin-terminal':
+        return RunScriptAction(terminal_emulator, ['--working-directory', path])
+      else:
+        RunScriptAction(terminal_emulator, ['--working-directory', path])
 
-        # some terminals might work differently. This is already prepared for that.
-        if terminal_emulator in [
-                'deepin-terminal','gnome-terminal', 'terminator', 'tilix', 'xfce-terminal'
-        ]:
-            return RunScriptAction(terminal_emulator,
-                                   ['--working-directory', path])
-
-        return DoNothingAction()
+    return DoNothingAction()
 
 
 class KeywordQueryEventListener(EventListener):
-    """ Listener that handles the user input """
+  """ Listener that handles the user input """
 
-    # pylint: disable=unused-argument,no-self-use
-    def on_event(self, event, extension):
-        """ Handles the event """
-        items = []
+  # pylint: disable=unused-argument,no-self-use
+  def on_event(self, event, extension):
+    """ Handles the event """
+    items = []
 
-        query = event.get_argument()
+    query = event.get_argument()
 
-        if not query or len(query) < 3:
-            return RenderResultListAction([
-                ExtensionResultItem(
-                    icon='images/icon.png',
-                    name='Keep typing your search criteria ...',
-                    on_enter=DoNothingAction())
-            ])
+    if not query or len(query) < 3:
+      return RenderResultListAction([
+        ExtensionResultItem(
+          icon='images/icon.png',
+          name='Keep typing your search criteria ...',
+          on_enter=DoNothingAction())
+      ])
 
-        keyword = event.get_keyword()
-        # Find the keyword id using the keyword (since the keyword can be changed by users)
-        for kw_id, kw in list(extension.preferences.items()):
-            if kw == keyword:
-                keyword_id = kw_id
+    keyword = event.get_keyword()
+    # Find the keyword id using the keyword (since the keyword can be changed by users)
+    for kw_id, kw in list(extension.preferences.items()):
+      if kw == keyword:
+        keyword_id = kw_id
 
-        file_type = FILE_SEARCH_ALL
-        if keyword_id == "ff_kw":
-            file_type = FILE_SEARCH_FILE
-        elif keyword_id == "fd_kw":
-            file_type = FILE_SEARCH_DIRECTORY
+    file_type = FILE_SEARCH_ALL
+    if keyword_id == "ff_kw":
+      file_type = FILE_SEARCH_FILE
+    elif keyword_id == "fd_kw":
+      file_type = FILE_SEARCH_DIRECTORY
 
-        results = extension.search(query.strip(), file_type)
+    results = extension.search(query.strip(), file_type)
 
-        if not results:
-            return RenderResultListAction([
-                ExtensionResultItem(icon='images/icon.png',
-                                    name='No Results found matching %s' %
-                                    query,
-                                    on_enter=HideWindowAction())
-            ])
-        items = []
-        for result in results[:int(extension.preferences['limit'])]:
-            items.append(
-                ExtensionSmallResultItem(
-                    icon=result['icon'],
-                    name=result['path'].decode("utf-8"),
-                    on_enter=OpenAction(result['path'].decode("utf-8")),
-                    on_alt_enter=extension.get_open_in_terminal_script(
-                        result['path'].decode("utf-8"))))
+    if not results:
+      return RenderResultListAction([
+        ExtensionResultItem(icon='images/icon.png',
+                            name='No Results found matching %s' %
+                                 query,
+                            on_enter=HideWindowAction())
+      ])
+    items = []
+    for result in results[:int(extension.preferences['limit'])]:
+      items.append(
+        ExtensionSmallResultItem(
+          icon=result['icon'],
+          name=result['path'].decode("utf-8"),
+          on_enter=OpenAction(result['path'].decode("utf-8")),
+          on_alt_enter=extension.get_open_in_terminal_script(
+            result['path'].decode("utf-8"))))
 
-        return RenderResultListAction(items)
+    return RenderResultListAction(items)
 
 
 if __name__ == '__main__':
-    FileSearchExtension().run()
+  FileSearchExtension().run()
